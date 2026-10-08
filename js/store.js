@@ -119,8 +119,19 @@
       .replace(/[^A-Z0-9-]/g, '');
   }
 
+  /* 12-hour display for all shown times: "18:00" -> "6:00 م" (inputs stay native) */
+  function t12(t) {
+    var p = String(t == null ? '' : t).split(':');
+    if (p.length < 2 || p[0] === '' || isNaN(+p[0])) return String(t || '');
+    var h = +p[0], m = p[1];
+    var ap = h < 12 ? 'ص' : 'م';
+    var h12 = h % 12;
+    if (h12 === 0) h12 = 12;
+    return h12 + ':' + m + ' ' + ap;
+  }
+
   var STATUS_AR = { available: 'متاحة', booked: 'محجوزة', review: 'قيد المراجعة', pending: 'منتظر', approved: 'معتمدة', rejected: 'مرفوضة', cancelled: 'ملغاة' };
   var VERSION = 'v6'; // bump on every release; gate+admin compare it to detect mixed cached copies
 
-  window.Store = { load: load, save: save, getSession: getSession, setSession: setSession, uid: uid, bookingCode: bookingCode, esc: esc, normCode: normCode, STATUS_AR: STATUS_AR, VERSION: VERSION };
+  window.Store = { load: load, save: save, getSession: getSession, setSession: setSession, uid: uid, bookingCode: bookingCode, esc: esc, normCode: normCode, t12: t12, STATUS_AR: STATUS_AR, VERSION: VERSION };
 })();

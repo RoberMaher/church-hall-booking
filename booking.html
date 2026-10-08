@@ -147,11 +147,11 @@
       return b.roomId === r.id && (b.status === 'pending' || b.status === 'approved') &&
         (b.date || '') === date && overlaps(start, end, b.start || '', bookingEnd(b));
     });
-    if (cb.length) return { kind: 'booking', by: cb[0].serviceName + ' (' + cb[0].start + '–' + bookingEnd(cb[0]) + ')' };
+    if (cb.length) return { kind: 'booking', by: cb[0].serviceName + ' (' + Store.t12(cb[0].start) + '–' + Store.t12(bookingEnd(cb[0])) + ')' };
     var bl = (db.blocks || []).filter(function (x) {
       return x.roomId === r.id && x.date === date && overlaps(start, end, x.from, x.to);
     });
-    if (bl.length) return { kind: 'block', by: 'مغلقة إداريًا (' + bl[0].from + '–' + bl[0].to + ')' };
+      if (bl.length) return { kind: 'block', by: 'مغلقة إداريًا (' + Store.t12(bl[0].from) + '–' + Store.t12(bl[0].to) + ')' };
     if (r.status === 'booked') return { kind: 'room', by: 'محجوزة اليوم' };
     return null;
   }
@@ -166,7 +166,7 @@
     if (n >= 60) hint.textContent = 'عددك ' + n + ' ← القاعة الكبيرة (70) اتفتحت تلقائيًا + إشعار للسكرتارية.';
     else hint.textContent = 'عددك ' + n + ' ← تظهر القاعات بسعة ' + Math.max(1, n - 10) + '–' + (n + 15) + ' فقط.';
 
-    resSub.textContent = 'الفترة: ' + start + ' — ' + end + ' • ' + hours + ' ساعات • ' + n + ' فرد • ' + date;
+    resSub.textContent = 'الفترة: ' + Store.t12(start) + ' — ' + Store.t12(end) + ' • ' + hours + ' ساعات • ' + n + ' فرد • ' + date;
 
     if (!db.rooms.length) {
       res.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">🏛️</div>' +
@@ -193,7 +193,7 @@
       return '<article class="hall"><div class="top-row"><div><b>قاعة ' + Store.esc(r.name) + '</b>' +
         '<small>' + Store.esc(r.floor || '') + ' • السعة القصوى ' + Store.esc(r.capacity) + ' فرد</small></div>' +
         (cf ? '<span class="st busy">● مقفولة</span>' : '<span class="st free">● متاحة</span>') + '</div>' +
-        '<div class="meta">🕐 الفترة: ' + start + ' حتى ' + end + ' (' + hours + ' ساعات)' +
+        '<div class="meta">🕐 الفترة: ' + Store.t12(start) + ' حتى ' + Store.t12(end) + ' (' + hours + ' ساعات)' +
         (cf ? '<br>🔒 ' + Store.esc(cf.by) + ' — مش فاضية في المعاد ده' : '') + '</div>' +
         (cf
           ? '<div class="foot"><button class="btn btn-o btn-block" data-wait="' + Store.esc(r.id) + '">🔔 نبهني لو فضيت</button></div>'

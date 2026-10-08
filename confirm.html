@@ -96,6 +96,11 @@
   }
 
   document.getElementById('tSub').textContent = b.code;
+  function endTime(s, h) {
+    var sp = String(s || '').split(':');
+    var hh = (+sp[0] || 0) + (+h || 0);
+    return String(hh).padStart(2, '0') + ':' + (sp[1] || '00');
+  }
   var free = db.rooms.filter(function (r) { return r.status === 'available' && r.id !== b.roomId; }).length;
   document.getElementById('altBtn').textContent = '← ' + free + ' قاعة فاضية الآن';
   document.getElementById('altInfo').textContent = 'يوجد حاليًا ' + free + ' قاعات متاحة — يمكنك التحويل إليها بضغطة زر واحدة دون الحاجة للتسجيل مجددًا.';
@@ -104,7 +109,7 @@
     '<div class="big-check" aria-hidden="true">✓</div>' +
     '<b style="color:var(--green)">تم تأكيد الحجز بنجاح</b>' +
     '<h2 style="font-size:26px;margin:6px 0">' + Store.esc(b.serviceName) + '</h2>' +
-    '<p style="font-size:13px;color:var(--muted)">قاعة ' + Store.esc(b.roomName) + ' • ' + Store.esc(b.date) + ' • ' + Store.esc(b.start) + ' • ' + Store.esc(b.count) + ' فرد</p>' +
+    '<p style="font-size:13px;color:var(--muted)">قاعة ' + Store.esc(b.roomName) + ' • ' + Store.esc(b.date) + ' • ' + Store.t12(b.start) + '–' + Store.t12(endTime(b.start, b.hours)) + ' • ' + Store.esc(b.count) + ' فرد</p>' +
     '<div class="code-panel" dir="ltr">' + Store.esc(b.code) + '<div style="font-size:10px;letter-spacing:4px;color:#cbd5e1">SCAN AT CHECK-IN</div></div>' +
     '<p style="font-size:12px;color:var(--muted)">الحالة: ' + Store.esc(Store.STATUS_AR[b.status] || b.status) + '</p>' +
     '<button class="btn btn-p btn-block" id="waive">⤓ تنازل عن الميعاد</button>' +

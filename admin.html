@@ -225,7 +225,7 @@
     box.innerHTML = pend.map(function (b) {
       var lv = db.services.find(function (v) { return v.code === b.serviceCode; });
       var who = (lv && lv.leader) ? ' (أمين الخدمة: ' + Store.esc(lv.leader) + ')' : '';
-      return '<div class="req"><div><b>' + Store.esc(b.serviceName) + who + ' • ' + Store.esc(b.count) + ' فرد • ' + Store.esc(b.date) + ' <span dir="ltr">' + Store.esc(b.start || '') + '–' + endTime(b.start, b.hours) + '</span> → قاعة ' + Store.esc(b.roomName) + '</b>' +
+      return '<div class="req"><div><b>' + Store.esc(b.serviceName) + who + ' • ' + Store.esc(b.count) + ' فرد • ' + Store.esc(b.date) + ' <span>' + Store.t12(b.start || '') + '–' + Store.t12(endTime(b.start, b.hours)) + '</span> → قاعة ' + Store.esc(b.roomName) + '</b>' +
         '<small>' + Store.esc(b.code) + ' • ' + Store.esc(b.serviceCode) + '</small></div>' +
         '<div class="rowbtns"><button class="mini ok" data-ap="' + b.id + '">✓ اعتماد</button>' +
         '<button class="mini no" data-rj="' + b.id + '">✕ رفض</button></div></div>';
@@ -297,14 +297,14 @@
     var hits = db.bookings.filter(function (b) { return b.roomId === room.id && (b.status === 'pending' || b.status === 'approved') && (b.date || '') === iso; });
     out += hits.map(function (h) {
       var pend = h.status === 'pending';
-      var range = Store.esc(h.start || '') + '–' + endTime(h.start, h.hours);
+      var range = Store.t12(h.start || '') + '–' + Store.t12(endTime(h.start, h.hours));
       return '<div class="cell-line"><span class="dot ' + (pend ? 'y' : 'r') + '">' + (pend ? 'منتظر' : 'محجوز') + '</span>' +
-        '<span dir="ltr">' + range + '</span></div>' +
+        '<span>' + range + '</span></div>' +
         '<div style="font-size:11px;color:var(--muted)">' + Store.esc(h.serviceName) + '</div>';
     }).join('');
     var blks = db.blocks.filter(function (x) { return x.roomId === room.id && x.date === iso; });
     out += blks.map(function (x) {
-      return '<div class="cell-line"><span class="blk-tag">🔒 <span dir="ltr">' + Store.esc(x.from) + '–' + Store.esc(x.to) + '</span></span>' +
+      return '<div class="cell-line"><span class="blk-tag">🔒 <span>' + Store.t12(x.from) + '–' + Store.t12(x.to) + '</span></span>' +
         '<button class="linkbtn" data-unblock="' + x.id + '" aria-label="إلغاء الحظر">✕</button></div>';
     }).join('');
     if (!hits.length && !blks.length) {
