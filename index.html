@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>تسجيل الدخول بالكود — حجز قاعات الكنيسة</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<main id="main" class="wrap">
+  <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">تسجيل الدخول بالكود</h1>
+  <div class="login-wrap">
+    <div class="login-logo">
+      <img src="assets/logo.png" alt="شعار الكنيسة — 50 عامًا">
+      <p class="gate-tag">كودك مفتاحك — احجز سمارت مش هارد ✨</p>
+    </div>
+
+    <!-- Code entry: field + button only -->
+    <div class="panel" id="gatePanel" style="border-top:4px solid var(--navy)">
+      <form id="f">
+        <label class="lbl" for="code">الكود</label>
+        <input id="code" dir="ltr" style="text-align:left" autocomplete="off" required aria-label="الكود">
+        <div class="err" id="err" role="alert"></div>
+        <button class="btn btn-p btn-block" style="margin-top:16px" type="submit">دخول</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-verse">«بلياقة وبحسب ترتيب» <small>(1كو 14:40)</small></div>
+  <div class="footer-main"><div class="wrap footer-grid">
+    <div class="footer-col">
+      <h3>كنيسة العذراء ويوحنا الحبيب</h3>
+      <p>منظومة الحجز الإلكتروني الذكي لقاعات المناسبات والخدمات والأنشطة الكنسية — جناكليس، الإسكندرية.</p>
+      <p class="gold">احجز سمارت مش هارد</p>
+    </div>
+    <div class="footer-col">
+      <h3>التواصل والاستعلام</h3>
+      <ul>
+        <li>📍 جناكليس، الإسكندرية، مصر</li>
+        <li>📞 سكرتارية الكنيسة: <span dir="ltr">03-5840000</span></li>
+        <li>🕘 المواعيد: يوميًا 9 ص — 9 م</li>
+      </ul>
+    </div>
+  </div></div>
+  <div class="footer-bottom"><div class="wrap bottom-in">
+    <span>© جميع الحقوق محفوظة لكنيسة السيدة العذراء ويوحنا الحبيب بجناكليس</span>
+    <span>خدمة التحول الرقمي الكنسي</span>
+  </div></div>
+</footer>
+
+<script src="js/store.js?v=6"></script>
+<script>
+(function () {
+  // Fatal guard: store.js missing or stale-cached -> form would silently reload.
+  if (!window.Store || typeof window.Store.normCode !== 'function') {
+    document.getElementById('gatePanel').insertAdjacentHTML('afterbegin',
+      '<div class="err show">ملفات الموقع قديمة أو ناقصة — حدّث الصفحة بزر <b>Ctrl+F5</b>، وتأكد أنك تفتح الموقع من مجلد <b>site</b> كاملًا (مع مجلد js).</div>');
+    document.getElementById('f').addEventListener('submit', function (e) { e.preventDefault(); });
+    return;
+  }
+  var db = Store.load();
+
+  // Bounced back from a protected page? Say why instead of silent looping.
+  // If admin's file version (av) differs from ours -> mixed old/new cached
+  // copies: the gate sends logins the old way and admin rejects them.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    if (q.get('why') !== 'session') return;
+    var mine = (window.Store && Store.VERSION) || 'v0';
+    var av = q.get('av') || 'v0';
+    var w = document.createElement('div');
+    w.className = 'err show';
+    w.style.marginBottom = '14px';
+    if (av !== mine) {
+      w.innerHTML = 'الملفات عندك نسخ ملخبطة (الدخول <b dir="ltr">' + Store.esc(mine) + '</b> والأدمن <b dir="ltr">' + Store.esc(av) + '</b>) — اضغط <b>Ctrl+F5</b> على الصفحة دي وعلى صفحة الأدمن لتحديث النسخ القديمة، ثم اكتب الكود من جديد.';
+    } else {
+      w.innerHTML = 'لم يتم الدخول — اكتب الكود مرة أخرى، وتأكد من تفعيل الكوكيز/التخزين في المتصفح. <a href="diag.html" style="font-weight:800">اضغط هنا لتشخيص المتصفح ←</a>';
+    }
+    var gp = document.getElementById('gatePanel');
+    gp.insertBefore(w, gp.firstChild);
+  })();
+
+  // This page NEVER navigates by itself: it is login-only. Typing a code
+  // overwrites any previous session, so switching codes needs no extra UI.
+
+  document.getElementById('f').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var err = document.getElementById('err');
+    err.classList.remove('show');
+    var code = Store.normCode(document.getElementById('code').value);
+    if (!code) { err.textContent = 'اكتب الكود الأول.'; err.classList.add('show'); return; }
+
+    if (/^SEC-/.test(code)) {
+      var s = db.secretaries.find(function (x) { return x.code === code; });
+      if (!s) { err.textContent = 'الكود غير صحيح — تأكد من كود السكرتارية (SEC-XXXX).'; err.classList.add('show'); return; }
+      if (!s.active) { err.textContent = 'هذا الحساب موقوف مؤقتًا. تواصل مع أمين السكرتارية الرئيسي.'; err.classList.add('show'); return; }
+      Store.setSession({ role: 'secretary', code: s.code, name: s.name });
+      if (!Store.getSession()) { err.textContent = 'تعذّر حفظ الجلسة — فعّل الكوكيز في المتصفح أو جرّب متصفحًا آخر.'; err.classList.add('show'); return; }
+      // Hash handoff: lets admin in even if storage dies mid-navigation. Admin strips it instantly.
+      location.href = 'admin.html#k=' + encodeURIComponent(s.code);
+      return;
+    }
+    if (/^SRV-/.test(code)) {
+      var v = db.services.find(function (x) { return x.code === code; });
+      if (!v) { err.textContent = 'كود الخدمة غير معروف — تواصل مع مسؤول القطاع.'; err.classList.add('show'); return; }
+      Store.setSession({ role: 'service', code: v.code, name: v.name });
+      if (!Store.getSession()) { err.textContent = 'تعذّر حفظ الجلسة — فعّل الكوكيز في المتصفح أو جرّب متصفحًا آخر.'; err.classList.add('show'); return; }
+      location.href = 'booking.html#k=' + encodeURIComponent(v.code);
+      return;
+    }
+    err.textContent = 'صيغة الكود غير صالحة — يبدأ بكود الخدمة SRV- أو كود السكرتارية SEC-.';
+    err.classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>

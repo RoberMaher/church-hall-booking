@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>لوحة تحكم السكرتارية — إدارة القاعات والحسابات</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <img src="assets/logo.png" alt="شعار الكنيسة — 50 عامًا">
+      <div class="t">منظومة إدارة الجداول والأنشطة<small>بوابة السكرتارية — لوحة التحكم</small></div>
+    </div>
+    <div class="badges">
+      <button class="chip" id="logout">⏻ تسجيل خروج</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <div class="admin-bar">
+    <div><span class="who" id="who">مرحبًا</span><br><small style="color:#cbd5e1" id="sub">—</small></div>
+    <div class="badges"><span class="pill ok">Admin Active ●</span><span class="pill" id="clock">—</span></div>
+  </div>
+
+  <div class="stat-grid" aria-label="إحصاءات">
+    <div class="stat"><b id="stRooms">0</b><span>إجمالي القاعات</span></div>
+    <div class="stat"><b id="stFree">0</b><span>متاحة الآن</span></div>
+    <div class="stat"><b id="stPend">0</b><span>طلبات منتظرة</span></div>
+    <div class="stat"><b id="stSec">1</b><span>حسابات السكرتارية</span></div>
+  </div>
+
+  <!-- Requests -->
+  <section class="sec" aria-label="طلبات الحجز">
+    <h2>🔔 مركز الإشعارات الفورية للطلبات</h2>
+    <p>اضغط ✓ اعتماد أو ✕ رفض — الإشعار تلقائي. الطلبات الجديدة تظهر هنا فور حجز الخدمات.</p>
+    <div class="req-list" id="reqs"></div>
+  </section>
+
+  <!-- Bookings control: cancel any pending or approved booking -->
+  <section class="sec" aria-label="إدارة الحجوزات">
+    <h2>🗑️ التحكم في الحجوزات والإلغاء</h2>
+    <p>إلغاء أي حجز منتظر أو معتمد — القاعة ترجع متاحة فورًا في الجدول وصفحات الحجز.</p>
+    <div id="bookList"></div>
+  </section>
+
+  <!-- Week table -->
+  <section class="sec" aria-label="جدول الأسبوع">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px">
+      <div><h2 id="weekTitle">🗓️ جدول الأسبوع</h2>
+      <p>أخضر فاضي • أحمر محجوز • أصفر منتظر — يُحدَّث تلقائيًا فور اعتماد الحجوزات.</p></div>
+      <div class="panel" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;padding:12px 14px">
+        <div><label class="lbl" style="margin-top:0" for="weekDate">تاريخ الجدول (اختر أي يوم)</label>
+        <input type="date" id="weekDate" style="min-width:170px"></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-o" style="padding:9px 14px" id="prevW" type="button">أسبوع →</button>
+          <button class="btn btn-o" style="padding:9px 14px" id="thisW" type="button">هذا الأسبوع</button>
+          <button class="btn btn-o" style="padding:9px 14px" id="nextW" type="button">← أسبوع</button>
+        </div>
+      </div>
+    </div>
+    <div class="tbl-wrap"><table class="grid" id="week">
+      <thead><tr id="weekHead"></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <!-- Rooms management -->
+  <section class="sec" aria-label="إدارة القاعات">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div><h2>🏛️ القاعات المتاحة ومباني الكنيسة</h2><p>القاعات تُضاف هنا فقط — وتبدأ القائمة من الصفر.</p></div>
+    </div>
+    <div class="panel">
+      <h3 style="color:var(--navy);font-size:16px">+ إضافة قاعة جديدة</h3>
+      <form id="roomForm">
+        <div class="frow">
+          <div><label class="lbl" for="rName">اسم القاعة</label><input id="rName" required></div>
+          <div><label class="lbl" for="rCap">السعة (فرد)</label><input id="rCap" type="number" min="1" max="500" required></div>
+        </div>
+        <div class="frow">
+          <div><label class="lbl" for="rFloor">الدور / الموقع داخل المبنى</label><input id="rFloor"></div>
+          <div><label class="lbl" for="rStatus">الحالة</label>
+            <select id="rStatus"><option value="available">متاحة</option><option value="review">قيد المراجعة</option><option value="booked">محجوزة</option></select></div>
+        </div>
+        <div><label class="lbl" for="rEq">التجهيزات (اختياري)</label><input id="rEq"></div>
+        <div style="margin-top:12px"><button class="btn btn-p" type="submit">＋ إضافة القاعة</button></div>
+      </form>
+    </div>
+    <div id="roomList" style="margin-top:12px"></div>
+  </section>
+
+  <!-- Secretary accounts: ONLY secretaries, no public signup -->
+  <section class="sec" aria-label="إدارة حسابات السكرتارية">
+    <h2>👥 إدارة حسابات السكرتارية والمسؤولين</h2>
+    <p>الحسابات للسكرتارية فقط — لا يوجد إنشاء حسابات للجمهور. التحكم في الأكواد المسموح لها بإشعارات الإدارة.</p>
+    <div class="panel">
+      <h3 style="color:var(--navy);font-size:16px">+ إضافة حساب سكرتير / مسؤول جديد</h3>
+      <form id="secForm">
+        <div class="frow">
+          <div><label class="lbl" for="sName">اسم المسؤول</label><input id="sName" required></div>
+          <div><label class="lbl" for="sCode">كود الدخول (يبدأ بـ SEC-)</label><input id="sCode" dir="ltr" style="text-align:left" required></div>
+        </div>
+        <div class="frow">
+          <div><label class="lbl" for="sPhone">رقم الموبايل (للإشعارات)</label><input id="sPhone" dir="ltr" style="text-align:left"></div>
+          <div><label class="lbl" for="sType">نوع الصلاحية</label>
+            <select id="sType"><option>مسؤول قاعات</option><option>أمين سكرتارية رئيسي</option></select></div>
+        </div>
+        <div class="err" id="secErr"></div>
+        <div style="margin-top:12px"><button class="btn btn-p" type="submit">＋ إضافة حساب</button></div>
+      </form>
+    </div>
+    <div class="tbl-wrap" style="margin-top:12px"><table class="grid" id="secTbl">
+      <thead><tr><th>اسم المسؤول</th><th>كود الصلاحية</th><th>نوع الصلاحية</th><th>رقم الموبايل</th><th>حالة التفعيل</th><th>إجراء</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <!-- Service codes (needed for booking) -->
+  <section class="sec" aria-label="أكواد الخدمات">
+    <h2>🏷️ أكواد الخدمات (للتجربة والحجز)</h2>
+    <p>أكواد الخدمات تُستخدم في صفحة الحجز — أضف كودًا لكل خدمة.</p>
+    <div class="panel">
+      <form id="srvForm" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div style="flex:1;min-width:180px"><label class="lbl" for="vName">اسم الخدمة</label><input id="vName" required></div>
+        <div style="flex:1;min-width:180px"><label class="lbl" for="vCode">الكود (SRV-…)</label><input id="vCode" dir="ltr" style="text-align:left" required></div>
+        <div style="flex:1;min-width:180px"><label class="lbl" for="vLeader">اسم أمين الخدمة</label><input id="vLeader" required></div>
+        <div><button class="btn btn-p" type="submit">＋ إضافة</button></div>
+      </form>
+      <div id="srvList" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-verse">«بلياقة وبحسب ترتيب» <small>(1كو 14:40)</small></div>
+  <div class="footer-main"><div class="wrap footer-grid">
+    <div class="footer-col">
+      <h3>كنيسة العذراء ويوحنا الحبيب</h3>
+      <p>منظومة الحجز الإلكتروني الذكي لقاعات المناسبات والخدمات والأنشطة الكنسية — جناكليس، الإسكندرية.</p>
+      <p class="gold">احجز سمارت مش هارد</p>
+    </div>
+    <div class="footer-col">
+      <h3>التواصل والاستعلام</h3>
+      <ul>
+        <li>📍 جناكليس، الإسكندرية، مصر</li>
+        <li>📞 سكرتارية الكنيسة: <span dir="ltr">03-5840000</span></li>
+        <li>🕘 المواعيد: يوميًا 9 ص — 9 م</li>
+      </ul>
+    </div>
+  </div></div>
+  <div class="footer-bottom"><div class="wrap bottom-in">
+    <span>© جميع الحقوق محفوظة لكنيسة السيدة العذراء ويوحنا الحبيب بجناكليس</span>
+    <span>خدمة التحول الرقمي الكنسي</span>
+  </div></div>
+</footer>
+
+<script src="js/store.js?v=6"></script>
+<script>
+(function () {
+  'use strict';
+  if (!window.Store || typeof window.Store.normCode !== 'function') {
+    document.body.insertAdjacentHTML('afterbegin',
+      '<div style="background:#fee2e2;color:#b91c1c;padding:12px;text-align:center;font-weight:800">ملفات الموقع قديمة أو ناقصة — حدّث الصفحة بزر Ctrl+F5.</div>');
+    return;
+  }
+  // Last-resort handoff: login passes the code in the URL hash so the
+  // dashboard opens even with zero working storage. Consumed + stripped
+  // immediately (history.replaceState) so it never stays in history.
+  (function () {
+    var m = (location.hash || '').match(/^#k=([A-Za-z0-9%._~-]+)$/);
+    if (!m) return;
+    var code = '';
+    try { code = Store.normCode(decodeURIComponent(m[1])); } catch (e) { return; }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e2) { /* keep going */ }
+    if (!code) return;
+    var db0 = Store.load();
+    var s0 = db0.secretaries.find(function (x) { return x.code === code; });
+    if (s0 && s0.active) Store.setSession({ role: 'secretary', code: s0.code, name: s0.name });
+  })();
+  var ses = Store.getSession();
+  // why=session lets the gate explain instead of silently bouncing back.
+  // av= (admin's file version) lets the gate detect mixed old/new cached copies.
+  var av = (window.Store && Store.VERSION) || 'v0';
+  if (!ses || ses.role !== 'secretary') { location.href = 'index.html?why=session&av=' + av; return; }
+  var db = Store.load();
+  var me = db.secretaries.find(function (s) { return s.code === ses.code; });
+  if (!me || !me.active) { Store.setSession(null); location.href = 'index.html?why=session&av=' + av; return; }
+
+  document.getElementById('who').textContent = 'مرحبًا أ. ' + me.name.replace('أمين السكرتارية الرئيسي', 'فلان');
+  document.getElementById('sub').textContent = me.code + ' • سكرتارية الكنيسة • ' + new Date().toLocaleDateString('ar-EG');
+  setInterval(function () {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('ar-EG');
+  }, 1000);
+
+  document.getElementById('logout').addEventListener('click', function () {
+    Store.setSession(null); location.href = 'index.html';
+  });
+
+  function refresh() {
+    db = Store.load();
+    document.getElementById('stRooms').textContent = db.rooms.length;
+    document.getElementById('stFree').textContent = db.rooms.filter(function (r) { return r.status === 'available'; }).length;
+    document.getElementById('stPend').textContent = db.bookings.filter(function (b) { return b.status === 'pending'; }).length;
+    document.getElementById('stSec').textContent = db.secretaries.length;
+    renderReqs(); renderBooks(); renderWeek(); renderRooms(); renderSecs(); renderSrvs();
+  }
+
+  /* — requests — */
+  function renderReqs() {
+    var box = document.getElementById('reqs');
+    var pend = db.bookings.filter(function (b) { return b.status === 'pending'; }).reverse();
+    if (!pend.length) {
+      box.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">✅</div><b>لا توجد طلبات منتظرة</b><p>الطلبات الجديدة من الخدمات ستظهر هنا فور إنشائها.</p></div>';
+      return;
+    }
+    box.innerHTML = pend.map(function (b) {
+      var lv = db.services.find(function (v) { return v.code === b.serviceCode; });
+      var who = (lv && lv.leader) ? ' (أمين الخدمة: ' + Store.esc(lv.leader) + ')' : '';
+      return '<div class="req"><div><b>' + Store.esc(b.serviceName) + who + ' • ' + Store.esc(b.count) + ' فرد • ' + Store.esc(b.date) + ' <span dir="ltr">' + Store.esc(b.start || '') + '–' + endTime(b.start, b.hours) + '</span> → قاعة ' + Store.esc(b.roomName) + '</b>' +
+        '<small>' + Store.esc(b.code) + ' • ' + Store.esc(b.serviceCode) + '</small></div>' +
+        '<div class="rowbtns"><button class="mini ok" data-ap="' + b.id + '">✓ اعتماد</button>' +
+        '<button class="mini no" data-rj="' + b.id + '">✕ رفض</button></div></div>';
+    }).join('');
+  }
+  function renderBooks() {
+    var box = document.getElementById('bookList');
+    var all = db.bookings.slice().reverse();
+    if (!all.length) {
+      box.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">📭</div><b>لا توجد حجوزات بعد</b><p>الحجوزات الجديدة ستظهر هنا فور إنشائها من صفحة الحجز.</p></div>';
+      return;
+    }
+    box.innerHTML = '<div class="req-list">' + all.map(function (b) {
+      var active = (b.status === 'pending' || b.status === 'approved');
+      var st = b.status === 'approved' ? '<span class="st free">معتمدة</span>'
+        : b.status === 'pending' ? '<span class="st pend">منتظرة</span>' : '<span class="st lock">ملغاة</span>';
+      return '<div class="req"><div><b>' + Store.esc(b.serviceName) + ' → قاعة ' + Store.esc(b.roomName) + '</b>' +
+        '<small>' + Store.esc(b.code) + ' • ' + Store.esc(b.date) + ' ' + Store.esc(b.start) + ' • ' + Store.esc(b.count) + ' فرد</small></div>' +
+        '<div class="rowbtns">' + st +
+        (active ? '<button class="mini no" data-cancel="' + b.id + '">إلغاء الحجز</button>' : '') + '</div></div>';
+    }).join('') + '</div>';
+  }
+  document.getElementById('bookList').addEventListener('click', function (e) {
+    var c = e.target.closest('[data-cancel]');
+    if (!c) return;
+    if (!confirm('إلغاء هذا الحجز نهائيًا؟ ستعود القاعة متاحة فورًا.')) return;
+    var b = db.bookings.find(function (x) { return x.id === c.dataset.cancel; });
+    if (b) { b.status = 'cancelled'; Store.save(db); refresh(); }
+  });
+  document.getElementById('reqs').addEventListener('click', function (e) {
+    var ap = e.target.closest('[data-ap]'), rj = e.target.closest('[data-rj]');
+    var id = ap ? ap.dataset.ap : rj ? rj.dataset.rj : null;
+    if (!id) return;
+    var b = db.bookings.find(function (x) { return x.id === id; });
+    if (b) { b.status = ap ? 'approved' : 'rejected'; Store.save(db); refresh(); }
+  });
+
+  /* — week table: free date choice + all 7 days (Saturday-first) — */
+  var AR_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  var AR_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  var weekAnchor = new Date();
+  weekAnchor.setHours(0, 0, 0, 0);
+  function isoOf(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function weekStart(d) {
+    var s = new Date(d);
+    s.setHours(0, 0, 0, 0);
+    s.setDate(s.getDate() - ((s.getDay() + 1) % 7)); // Saturday-first week
+    return s;
+  }
+  function weekDays() {
+    var s = weekStart(weekAnchor), out = [];
+    for (var i = 0; i < 7; i++) { var d = new Date(s); d.setDate(s.getDate() + i); out.push(d); }
+    return out;
+  }
+  function fmtRange(days) {
+    var a = days[0], b = days[6];
+    if (a.getMonth() === b.getMonth()) return a.getDate() + ' – ' + b.getDate() + ' ' + AR_MONTHS[b.getMonth()] + ' ' + b.getFullYear();
+    return a.getDate() + ' ' + AR_MONTHS[a.getMonth()] + ' – ' + b.getDate() + ' ' + AR_MONTHS[b.getMonth()] + ' ' + b.getFullYear();
+  }
+  function endTime(start, hours) {
+    var p = String(start || '').split(':');
+    var h = (+p[0] || 0) + (+hours || 0);
+    return String(h).padStart(2, '0') + ':' + (p[1] || '00');
+  }
+  function dayCell(room, iso) {
+    var out = '';
+    var hits = db.bookings.filter(function (b) { return b.roomId === room.id && (b.status === 'pending' || b.status === 'approved') && (b.date || '') === iso; });
+    out += hits.map(function (h) {
+      var pend = h.status === 'pending';
+      var range = Store.esc(h.start || '') + '–' + endTime(h.start, h.hours);
+      return '<div class="cell-line"><span class="dot ' + (pend ? 'y' : 'r') + '">' + (pend ? 'منتظر' : 'محجوز') + '</span>' +
+        '<span dir="ltr">' + range + '</span></div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + Store.esc(h.serviceName) + '</div>';
+    }).join('');
+    var blks = db.blocks.filter(function (x) { return x.roomId === room.id && x.date === iso; });
+    out += blks.map(function (x) {
+      return '<div class="cell-line"><span class="blk-tag">🔒 <span dir="ltr">' + Store.esc(x.from) + '–' + Store.esc(x.to) + '</span></span>' +
+        '<button class="linkbtn" data-unblock="' + x.id + '" aria-label="إلغاء الحظر">✕</button></div>';
+    }).join('');
+    if (!hits.length && !blks.length) {
+      out = room.status === 'booked' ? '<span class="dot r">محجوز</span>' : '<span class="dot g">فاضي</span>';
+    }
+    out += '<div><button class="linkbtn" data-blockform="' + room.id + '|' + iso + '">＋ حظر ساعات</button></div>';
+    return out;
+  }
+  function renderWeek() {
+    var days = weekDays();
+    document.getElementById('weekTitle').textContent = '🗓️ جدول الأسبوع: ' + fmtRange(days);
+    try { document.getElementById('weekDate').value = isoOf(weekAnchor); } catch (e) { /* ignore */ }
+    document.getElementById('weekHead').innerHTML = '<th>القاعة والتفاصيل</th>' + days.map(function (d) {
+      return '<th>' + AR_DAYS[d.getDay()] + '<br><small>' + d.getDate() + ' ' + AR_MONTHS[d.getMonth()] + '</small></th>';
+    }).join('');
+    var tb = document.querySelector('#week tbody');
+    if (!db.rooms.length) {
+      tb.innerHTML = '<tr><td colspan="8">لا توجد قاعات بعد — أضف أول قاعة من نموذج الإضافة بالأسفل.</td></tr>';
+      return;
+    }
+    tb.innerHTML = db.rooms.map(function (r) {
+      return '<tr><td>قاعة ' + Store.esc(r.name) + ' (' + Store.esc(r.capacity) + ')</td>' +
+        days.map(function (d) { return '<td>' + dayCell(r, isoOf(d)) + '</td>'; }).join('') + '</tr>';
+    }).join('');
+  }
+  // Per-day hour-block controls (expand form inside the cell, save, unblock)
+  document.getElementById('week').addEventListener('click', function (e) {
+    var f = e.target.closest('[data-blockform]');
+    if (f) {
+      var parts = f.dataset.blockform.split('|');
+      var cell = f.parentElement;
+      cell.innerHTML = '<div class="blk-form"><span style="font-size:11px">من</span>' +
+        '<input type="time" data-bfrom value="18:00" aria-label="من الساعة">' +
+        '<span style="font-size:11px">إلى</span>' +
+        '<input type="time" data-bto value="20:00" aria-label="إلى الساعة">' +
+        '<button class="mini ok" data-blocksave="' + parts[0] + '|' + parts[1] + '">حظر</button></div>';
+      return;
+    }
+    var s = e.target.closest('[data-blocksave]');
+    if (s) {
+      var ps = s.dataset.blocksave.split('|');
+      var cellBox = s.closest('td');
+      var from = cellBox.querySelector('[data-bfrom]').value;
+      var to = cellBox.querySelector('[data-bto]').value;
+      if (!from || !to || from >= to) { alert('حدد فترة صحيحة (من ساعة إلى ساعة بعدها).'); return; }
+      db.blocks.push({ id: Store.uid('BL'), roomId: ps[0], date: ps[1], from: from, to: to });
+      Store.save(db);
+      refresh();
+      return;
+    }
+    var u = e.target.closest('[data-unblock]');
+    if (u) {
+      db.blocks = db.blocks.filter(function (x) { return x.id !== u.dataset.unblock; });
+      Store.save(db);
+      refresh();
+    }
+  });
+  document.getElementById('weekDate').addEventListener('change', function (e) {
+    var v = e.target.value;
+    if (!v) return;
+    var parts = v.split('-');
+    weekAnchor = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    renderWeek();
+  });
+  document.getElementById('week').addEventListener('click', function (e) {
+    var t = e.target;
+    var id = t.dataset.free || t.dataset.busy || t.dataset.delr;
+    if (!id) return;
+    var r = db.rooms.find(function (x) { return x.id === id; });
+    if (!r) return;
+    if (t.dataset.delr) { if (!confirm('حذف قاعة ' + r.name + '؟')) return; db.rooms = db.rooms.filter(function (x) { return x.id !== id; }); }
+    else r.status = t.dataset.free ? 'available' : 'booked';
+    Store.save(db); refresh();
+  });
+
+  /* — rooms — */
+  document.getElementById('roomForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    db.rooms.push({
+      id: Store.uid('R'),
+      name: document.getElementById('rName').value.trim(),
+      capacity: +document.getElementById('rCap').value,
+      floor: document.getElementById('rFloor').value.trim(),
+      status: document.getElementById('rStatus').value,
+      equipment: document.getElementById('rEq').value.trim()
+    });
+    Store.save(db); e.target.reset(); refresh();
+  });
+  function renderRooms() {
+    var box = document.getElementById('roomList');
+    if (!db.rooms.length) {
+      box.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">🏛️</div><b>القائمة فارغة — ابدأ من الصفر</b><p>أضف أول قاعة من النموذج أعلاه وستظهر فورًا في الموقع.</p></div>';
+      return;
+    }
+    box.innerHTML = '<div class="halls">' + db.rooms.map(function (r) {
+      var st = r.status === 'available' ? '<span class="st free">نشطة</span>' : r.status === 'booked' ? '<span class="st busy">محجوزة</span>' : '<span class="st pend">مراجعة</span>';
+      return '<div class="hall"><div class="top-row"><div><b>قاعة ' + Store.esc(r.name) + '</b><small>' + Store.esc(r.floor || '—') + ' • ' + Store.esc(r.capacity) + ' فرد</small></div>' + st + '</div>' +
+        '<div class="rowbtns"><button class="mini dim" data-toggle="' + r.id + '">تعديل الحالة</button>' +
+        '<button class="mini no" data-rm="' + r.id + '">حذف</button></div></div>';
+    }).join('') + '</div>';
+  }
+  document.getElementById('roomList').addEventListener('click', function (e) {
+    var tg = e.target.closest('[data-toggle]'), rm = e.target.closest('[data-rm]');
+    if (tg) {
+      var r = db.rooms.find(function (x) { return x.id === tg.dataset.toggle; });
+      r.status = r.status === 'available' ? 'review' : r.status === 'review' ? 'booked' : 'available';
+      Store.save(db); refresh();
+    }
+    if (rm) {
+      if (!confirm('حذف هذه القاعة؟')) return;
+      db.rooms = db.rooms.filter(function (x) { return x.id !== rm.dataset.rm; });
+      Store.save(db); refresh();
+    }
+  });
+
+  /* — secretary accounts (only secretaries) — */
+  document.getElementById('secForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var err = document.getElementById('secErr'); err.classList.remove('show');
+    var code = Store.normCode(document.getElementById('sCode').value);
+    if (!/^SEC-[A-Z0-9-]{2,}$/.test(code)) { err.textContent = 'الكود يجب أن يبدأ بـ SEC-.'; err.classList.add('show'); return; }
+    if (db.secretaries.some(function (s) { return s.code === code; })) { err.textContent = 'هذا الكود مستخدم بالفعل.'; err.classList.add('show'); return; }
+    db.secretaries.push({ code: code, name: document.getElementById('sName').value.trim(), phone: document.getElementById('sPhone').value.trim(), role: document.getElementById('sType').value, active: true });
+    Store.save(db); e.target.reset(); refresh();
+  });
+  function renderSecs() {
+    var tb = document.querySelector('#secTbl tbody');
+    tb.innerHTML = db.secretaries.map(function (s) {
+      return '<tr><td>' + Store.esc(s.name) + (s.main ? ' (الحالي)' : '') + '</td><td dir="ltr">' + Store.esc(s.code) + '</td>' +
+        '<td>' + Store.esc(s.role || (s.main ? 'أمين سكرتارية رئيسي' : 'مسؤول قاعات')) + '</td>' +
+        '<td dir="ltr">' + Store.esc(s.phone || '—') + '</td>' +
+        '<td>' + (s.active ? '<span class="st free">● مفعّل</span>' : '<span class="st lock">موقوف</span>') + '</td>' +
+        '<td><div class="rowbtns">' + (s.main ? '<span style="font-size:12px;color:var(--muted)">المدير الرئيسي</span>'
+          : '<button class="mini ' + (s.active ? 'dim' : 'ok') + '" data-sec="' + Store.esc(s.code) + '">' + (s.active ? 'إيقاف' : 'تفعيل') + '</button>' +
+            '<button class="mini no" data-delsec="' + Store.esc(s.code) + '">حذف</button>') + '</div></td></tr>';
+    }).join('');
+  }
+  document.getElementById('secTbl').addEventListener('click', function (e) {
+    var ds = e.target.closest('[data-delsec]');
+    if (ds) {
+      if (!confirm('حذف حساب ' + ds.dataset.delsec + ' نهائيًا؟')) return;
+      db.secretaries = db.secretaries.filter(function (x) { return x.code !== ds.dataset.delsec || x.main; });
+      Store.save(db); refresh();
+      return;
+    }
+    var b = e.target.closest('[data-sec]');
+    if (!b) return;
+    var s = db.secretaries.find(function (x) { return x.code === b.dataset.sec; });
+    if (s && !s.main) { s.active = !s.active; Store.save(db); refresh(); }
+  });
+
+  /* — service codes — */
+  document.getElementById('srvForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var code = Store.normCode(document.getElementById('vCode').value);
+    if (!/^SRV-[A-Z0-9-]{2,}$/.test(code)) { alert('الكود يجب أن يبدأ بـ SRV-'); return; }
+    var vName = document.getElementById('vName').value.trim();
+    var vLeader = document.getElementById('vLeader').value.trim();
+    if (!vLeader) { alert('اكتب اسم أمين الخدمة.'); return; }
+    if (db.services.some(function (x) { return x.code === code; })) { alert('هذا الكود مستخدم بالفعل.'); return; }
+    db.services.push({ code: code, name: vName, leader: vLeader });
+    Store.save(db); e.target.reset(); refresh();
+  });
+  function renderSrvs() {
+    document.getElementById('srvList').innerHTML = db.services.map(function (v) {
+      return '<span class="chip on" dir="ltr">' + Store.esc(v.code) + '</span>' +
+        '<span style="font-size:12px">' + Store.esc(v.name) + (v.leader ? ' — أمين الخدمة: ' + Store.esc(v.leader) : '') + '</span>' +
+        ' <button class="mini no" data-delsrv="' + Store.esc(v.code) + '">حذف</button>';
+    }).join(' ') || '<span style="font-size:13px;color:var(--muted)">لا توجد أكواد خدمات.</span>';
+  }
+  document.getElementById('srvList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-delsrv]');
+    if (!b) return;
+    if (!confirm('حذف كود ' + b.dataset.delsrv + ' نهائيًا؟')) return;
+    db.services = db.services.filter(function (x) { return x.code !== b.dataset.delsrv; });
+    Store.save(db); refresh();
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

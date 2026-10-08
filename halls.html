@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>القاعات — احجز سمارت مش هارد</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <img src="assets/logo.png" alt="شعار الكنيسة — 50 عامًا">
+      <div class="t">القاعات<small id="hallSub">سعة وحالة فقط</small></div>
+    </div>
+    <nav class="menu" aria-label="التنقل الرئيسي">
+      <a class="on" href="halls.html">القاعات</a>
+      <a href="booking.html">احجز</a>
+      <a href="confirm.html">تأكيدي</a>
+    </nav>
+    <div class="badges">
+      <a class="iconbtn" href="index.html" aria-label="الدخول بالكود">👤</a>
+      <a class="cta" href="booking.html">احجز الآن</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="sec">
+    <h2>القاعات — <span id="countTitle">0 قاعة</span></h2>
+    <p>استعراض مباشر لجميع قاعات الكنيسة وسعتها وحالتها. 🟢 متاح • 🔴 محجوز • 🟡 مراجعة • ⚪ 60+ فقط</p>
+    <div class="toolbar" role="search">
+      <input type="search" id="q" aria-label="ابحث باسم القاعة أو الدور">
+      <button class="chip on" data-f="all">الكل <span id="nAll">0</span></button>
+      <button class="chip" data-f="big">الكبيرة (60+)</button>
+      <button class="chip" data-f="mid">المتوسطة (30-50)</button>
+      <button class="chip" data-f="small">الصغيرة (20-30)</button>
+      <button class="chip" data-f="free">● المتاحة حاليًا</button>
+    </div>
+    <div id="list"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-verse">«بلياقة وبحسب ترتيب» <small>(1كو 14:40)</small></div>
+  <div class="footer-main"><div class="wrap footer-grid">
+    <div class="footer-col">
+      <h3>كنيسة العذراء ويوحنا الحبيب</h3>
+      <p>منظومة الحجز الإلكتروني الذكي لقاعات المناسبات والخدمات والأنشطة الكنسية — جناكليس، الإسكندرية.</p>
+      <p class="gold">احجز سمارت مش هارد</p>
+    </div>
+    <div class="footer-col">
+      <h3>التواصل والاستعلام</h3>
+      <ul>
+        <li>📍 جناكليس، الإسكندرية، مصر</li>
+        <li>📞 سكرتارية الكنيسة: <span dir="ltr">03-5840000</span></li>
+        <li>🕘 المواعيد: يوميًا 9 ص — 9 م</li>
+      </ul>
+    </div>
+  </div></div>
+  <div class="footer-bottom"><div class="wrap bottom-in">
+    <span>© جميع الحقوق محفوظة لكنيسة السيدة العذراء ويوحنا الحبيب بجناكليس</span>
+    <span>خدمة التحول الرقمي الكنسي</span>
+  </div></div>
+</footer>
+
+<script src="js/store.js?v=6"></script>
+<script>
+(function () {
+  // Code-only area: no session (service or secretary) -> back to the gate.
+  if (!window.Store || !Store.getSession()) { location.href = 'index.html?why=session'; return; }
+  var db = Store.load();
+  var list = document.getElementById('list');
+  var filter = 'all';
+
+  function bucket(r) {
+    if (r.capacity >= 60) return 'big';
+    if (r.capacity >= 30) return 'mid';
+    return 'small';
+  }
+  function statusPill(r) {
+    if (r.capacity >= 60) return '<span class="st lock">60+ فقط</span>';
+    if (r.status === 'available') return '<span class="st free">● متاحة</span>';
+    if (r.status === 'booked') return '<span class="st busy">● محجوزة</span>';
+    return '<span class="st pend">● مراجعة سكرتارية</span>';
+  }
+  function actionBtn(r) {
+    if (r.status === 'available') return '<div class="foot"><a class="btn btn-p btn-block" href="booking.html?room=' + encodeURIComponent(r.id) + '">📅 احجز الآن</a></div>';
+    if (r.status === 'booked') return '<div class="foot"><button class="btn btn-o btn-block" data-notify="' + Store.esc(r.id) + '">🔔 طلب تنبيه عند الإخلاء</button></div>';
+    return '<div class="foot"><button class="btn btn-o btn-block" disabled>⌛ قيد المراجعة</button></div>';
+  }
+
+  function render() {
+    document.getElementById('countTitle').textContent = db.rooms.length + ' قاعة';
+    document.getElementById('hallSub').textContent = db.rooms.length + ' قاعة • سعة وحالة فقط';
+    document.getElementById('nAll').textContent = db.rooms.length;
+    var q = (document.getElementById('q').value || '').trim();
+
+    if (!db.rooms.length) {
+      list.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">🏛️</div>' +
+        '<b>لا توجد قاعات بعد</b>' +
+        '<p>ابدأ من الصفر: القاعات تُضاف من حساب السكرتارية فقط.<br>ادخل بكود السكرتارية من شاشة الدخول ثم أضف أول قاعة (الاسم + السعة + الدور).</p>' +
+        '<div class="actions" style="justify-content:center"><a class="btn btn-p" href="index.html">تسجيل الدخول بالكود</a></div></div>';
+      return;
+    }
+
+    var rows = db.rooms.filter(function (r) {
+      if (filter === 'free' && r.status !== 'available') return false;
+      if ((filter === 'big' || filter === 'mid' || filter === 'small') && bucket(r) !== filter) return false;
+      if (q && (r.name + ' ' + (r.floor || '')).indexOf(q) === -1) return false;
+      return true;
+    });
+
+    if (!rows.length) {
+      list.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">🔍</div><b>لا نتائج مطابقة</b><p>جرّب كلمة بحث مختلفة أو غيّر الفلتر.</p></div>';
+      return;
+    }
+
+    list.innerHTML = '<div class="halls">' + rows.map(function (r) {
+      return '<article class="hall"><div class="top-row"><div><b>قاعة ' + Store.esc(r.name) + '</b>' +
+        '<small>' + Store.esc(r.floor || '—') + '</small></div>' + statusPill(r) + '</div>' +
+        '<div class="meta">👥 السعة: <b>' + Store.esc(r.capacity) + ' فرد</b>' +
+        (r.equipment ? '<br>🛠️ ' + Store.esc(r.equipment) : '') + '</div>' + actionBtn(r) + '</article>';
+    }).join('') + '</div>';
+  }
+
+  document.querySelectorAll('.chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      document.querySelectorAll('.chip').forEach(function (x) { x.classList.remove('on'); });
+      c.classList.add('on'); filter = c.dataset.f; render();
+    });
+  });
+  document.getElementById('q').addEventListener('input', render);
+  list.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-notify]');
+    if (b) alert('تم تسجيل طلب التنبيه — ستصلك رسالة فور إخلاء القاعة.');
+  });
+  render();
+})();
+</script>
+</body>
+</html>

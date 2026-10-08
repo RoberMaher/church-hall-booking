@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>تشخيص المتصفح</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap" style="max-width:640px;padding-top:32px">
+  <div class="panel">
+    <h2 style="color:var(--navy)">🔍 تشخيص المتصفح</h2>
+    <p style="font-size:14px;color:var(--muted)">الصفحة دي بتختبر المتصفح نفسه (مش محتاجة أي ملف تاني). انسخ النتيجة وابعتها.</p>
+    <div id="out" style="font-size:14px;line-height:2"></div>
+    <div class="panel" style="margin-top:12px;background:var(--navy);color:#fff;border:0">
+      <b>انسخ والصق هذا السطر:</b>
+      <p id="copyline" dir="ltr" style="text-align:left;background:#fff;color:var(--navy);border-radius:8px;padding:10px;margin-top:8px;font-size:13px">…</p>
+    </div>
+    <a class="btn btn-p" style="margin-top:12px" href="index.html">الرجوع للدخول</a>
+  </div>
+</main>
+<script>
+(function () {
+  var r = {};
+  r.ua = navigator.userAgent.slice(0, 90);
+  r.proto = location.protocol;
+  // 1. localStorage same-page
+  try { localStorage.setItem('__t', '1'); r.lsSame = localStorage.getItem('__t') === '1' ? 'OK' : 'READ-FAIL'; localStorage.removeItem('__t'); }
+  catch (e) { r.lsSame = 'BLOCKED'; }
+  // 2. localStorage across reload (counter)
+  try {
+    var n = parseInt(localStorage.getItem('__c') || '0', 10) + 1;
+    localStorage.setItem('__c', String(n));
+    r.lsReload = 'visit#' + n + (n > 1 ? ' (PERSISTS)' : ' (first visit — reload page to confirm)');
+  } catch (e) { r.lsReload = 'BLOCKED'; }
+  // 3. window.name across navigation (?from=1 means we came back via link)
+  var q = new URLSearchParams(location.search);
+  if (q.get('from') === '1') {
+    r.winName = (window.name || '') === 'DIAG-PING' ? 'OK' : 'EMPTY(' + (window.name || '').slice(0, 20) + ')';
+  } else {
+    window.name = 'DIAG-PING';
+    r.winName = 'click the link below, then read again';
+  }
+  var rows = [
+    ['المتصفح', r.ua], ['طريقة الفتح', r.proto],
+    ['التخزين (نفس الصفحة)', r.lsSame],
+    ['التخزين (بعد التحديث)', r.lsReload],
+    ['ذاكرة التبويبة (بعد التنقل)', r.winName]
+  ];
+  document.getElementById('out').innerHTML = rows.map(function (x) {
+    return '<div>• <b>' + x[0] + ':</b> <span dir="auto">' + x[1] + '</span></div>';
+  }).join('') + '<div style="margin-top:10px"><a href="diag.html?from=1">اضغط هنا للانتقال ثم اقرأ سطر «ذاكرة التبويبة»</a></div>';
+  document.getElementById('copyline').textContent =
+    'DIAG | proto=' + r.proto + ' | lsSame=' + r.lsSame + ' | lsReload=' + r.lsReload + ' | winName=' + r.winName + ' | ua=' + r.ua;
+})();
+</script>
+</body>
+</html>

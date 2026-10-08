@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>تأكيدك — اعرض الكود على أمين القاعة</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <img src="assets/logo.png" alt="شعار الكنيسة — 50 عامًا">
+      <div class="t">تذكرتي<small id="tSub">تأكيد الحجز</small></div>
+    </div>
+    <nav class="menu" aria-label="التنقل الرئيسي">
+      <a href="halls.html">القاعات</a>
+      <a href="booking.html">احجز</a>
+      <a class="on" href="confirm.html">تأكيدي</a>
+    </nav>
+    <div class="badges">
+      <a class="iconbtn" href="index.html" aria-label="الدخول بالكود">👤</a>
+      <a class="cta" href="halls.html">القاعات</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="sec">
+    <div style="text-align:center;max-width:640px;margin:0 auto">
+      <span class="eyebrow">⚙️ منظومة الحجز والتوزيع الذكي للقاعات</span>
+      <h1 style="font-size:34px">تأكيدك — اعرض الكود على أمين القاعة</h1>
+      <p class="sub" style="margin-inline:auto">تم تأكيد حجز القاعة بنجاح. يُرجى إبراز كود الحجز الرقمي لمسؤول القاعة عند الاستلام لفتح الأبواب وتشغيل التجهيزات.</p>
+    </div>
+    <div class="phone-wrap" style="margin-top:20px">
+      <div class="ticket-card" id="ticket" aria-live="polite"></div>
+      <div>
+        <div class="panel"><b>مشغول؟ أو أُلغيتم ميعاد الخدمة؟</b>
+          <p style="font-size:13px;color:var(--muted)">زرار التنازل يُتيح القاعة فورًا لباقي خدمات الكنيسة المحتاجة دون مراجعات ورقية، ويحفظ حق خدمتك في نقاط الالتزام الكنسي.</p>
+          <p style="font-size:13px;color:var(--muted)">«كُلُّ شَيْءٍ فَلْيَكُنْ بِلِيَاقَةٍ وَبِحَسَبِ تَرْتِيبٍ»</p>
+        </div>
+        <div class="panel"><b>⚡ طارئ؟ محتاج تبديل فوري؟</b>
+          <p style="font-size:13px;color:var(--muted)" id="altInfo">يوجد حاليًا قاعات متاحتان في نفس الفترة الزمنية — يمكنك التحويل إليهما بضغطة زر واحدة.</p>
+          <div style="margin-top:10px"><a class="btn btn-ok btn-block" href="halls.html" id="altBtn">← قاعات فاضية الآن</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-verse">«بلياقة وبحسب ترتيب» <small>(1كو 14:40)</small></div>
+  <div class="footer-main"><div class="wrap footer-grid">
+    <div class="footer-col">
+      <h3>كنيسة العذراء ويوحنا الحبيب</h3>
+      <p>منظومة الحجز الإلكتروني الذكي لقاعات المناسبات والخدمات والأنشطة الكنسية — جناكليس، الإسكندرية.</p>
+      <p class="gold">احجز سمارت مش هارد</p>
+    </div>
+    <div class="footer-col">
+      <h3>التواصل والاستعلام</h3>
+      <ul>
+        <li>📍 جناكليس، الإسكندرية، مصر</li>
+        <li>📞 سكرتارية الكنيسة: <span dir="ltr">03-5840000</span></li>
+        <li>🕘 المواعيد: يوميًا 9 ص — 9 م</li>
+      </ul>
+    </div>
+  </div></div>
+  <div class="footer-bottom"><div class="wrap bottom-in">
+    <span>© جميع الحقوق محفوظة لكنيسة السيدة العذراء ويوحنا الحبيب بجناكليس</span>
+    <span>خدمة التحول الرقمي الكنسي</span>
+  </div></div>
+</footer>
+
+<script src="js/store.js?v=6"></script>
+<script>
+(function () {
+  // Code-only area: no session (service or secretary) -> back to the gate.
+  if (!window.Store || !Store.getSession()) { location.href = 'index.html?why=session'; return; }
+  var db = Store.load();
+  var code = new URLSearchParams(location.search).get('code');
+  var b = db.bookings.find(function (x) { return x.code === code; }) || db.bookings.slice(-1)[0];
+  var box = document.getElementById('ticket');
+
+  if (!b) {
+    box.innerHTML = '<div class="big-check" style="background:var(--muted)">؟</div><b>لا يوجد حجز بعد</b>' +
+      '<p style="color:var(--muted);font-size:14px">احجز أولًا من صفحة الحجز وستظهر تذكرتك هنا.</p>' +
+      '<a class="btn btn-p btn-block" href="booking.html">احجز الآن</a>';
+    return;
+  }
+
+  document.getElementById('tSub').textContent = b.code;
+  var free = db.rooms.filter(function (r) { return r.status === 'available' && r.id !== b.roomId; }).length;
+  document.getElementById('altBtn').textContent = '← ' + free + ' قاعة فاضية الآن';
+  document.getElementById('altInfo').textContent = 'يوجد حاليًا ' + free + ' قاعات متاحة — يمكنك التحويل إليها بضغطة زر واحدة دون الحاجة للتسجيل مجددًا.';
+
+  box.innerHTML =
+    '<div class="big-check" aria-hidden="true">✓</div>' +
+    '<b style="color:var(--green)">تم تأكيد الحجز بنجاح</b>' +
+    '<h2 style="font-size:26px;margin:6px 0">' + Store.esc(b.serviceName) + '</h2>' +
+    '<p style="font-size:13px;color:var(--muted)">قاعة ' + Store.esc(b.roomName) + ' • ' + Store.esc(b.date) + ' • ' + Store.esc(b.start) + ' • ' + Store.esc(b.count) + ' فرد</p>' +
+    '<div class="code-panel" dir="ltr">' + Store.esc(b.code) + '<div style="font-size:10px;letter-spacing:4px;color:#cbd5e1">SCAN AT CHECK-IN</div></div>' +
+    '<p style="font-size:12px;color:var(--muted)">الحالة: ' + Store.esc(Store.STATUS_AR[b.status] || b.status) + '</p>' +
+    '<button class="btn btn-p btn-block" id="waive">⤓ تنازل عن الميعاد</button>' +
+    '<a class="btn btn-o btn-block" style="margin-top:8px" href="booking.html">⇄ نقل إلى ميعاد / قاعة أخرى</a>';
+
+  document.getElementById('waive').addEventListener('click', function () {
+    if (!confirm('تأكيد التنازل عن هذا الميعاد؟ ستعود القاعة متاحة فورًا.')) return;
+    b.status = 'cancelled'; Store.save(db); location.reload();
+  });
+})();
+</script>
+</body>
+</html>

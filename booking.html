@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>احجز بالساعة — احجز سمارت مش هارد</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <img src="assets/logo.png" alt="شعار الكنيسة — 50 عامًا">
+      <div class="t">احجز قاعة<small>دقيقة واحدة • بالتاريخ والساعة</small></div>
+    </div>
+    <nav class="menu" aria-label="التنقل الرئيسي">
+      <a href="halls.html">القاعات</a>
+      <a class="on" href="booking.html">احجز</a>
+      <a href="confirm.html">تأكيدي</a>
+    </nav>
+    <div class="badges">
+      <a class="iconbtn" href="index.html" aria-label="الدخول بالكود">👤</a>
+      <a class="cta" href="halls.html">كل القاعات</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero" aria-label="عنوان الحجز" style="padding-bottom:0">
+    <div class="ticket" style="text-align:center">
+      <span class="pill" style="background:rgba(201,162,39,.2);color:var(--gold)">⚙️ جدولة دقيقة ومطابقة تلقائية</span>
+      <h1 style="color:#fff;font-size:30px;margin-top:8px">احجز بالساعة — جدولة دقيقة ومطابقة تلقائية</h1>
+      <p style="color:#cbd5e1;font-size:14px">حدد تاريخ الحجز، وقت البدء، وعدد الساعات المطلوبة بالساعة على مدار اليوم. النظام يتحقق فورًا من توافق القاعات المتاحة ومطابقتها لحجم خدمتك.</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="نموذج الحجز">
+    <div class="panel">
+      <h2 style="font-size:18px">🗓️ محددات موعد وساعات الحجز</h2>
+      <form id="f">
+        <div class="frow">
+          <div>
+            <label class="lbl" for="date">تاريخ الحجز المطلوب</label>
+            <input type="date" id="date" required>
+          </div>
+          <div>
+            <label class="lbl" for="start">وقت بدء الحجز بالساعة</label>
+            <input type="time" id="start" value="18:00" required>
+          </div>
+        </div>
+        <div class="frow">
+          <div>
+            <label class="lbl" for="hours">عدد الساعات المطلوبة</label>
+            <input type="number" id="hours" min="1" max="8" value="2" required>
+          </div>
+          <div>
+            <label class="lbl" for="count">عدد المخدومين / الحضور</label>
+            <input type="number" id="count" min="1" max="500" value="25" required>
+          </div>
+        </div>
+        <div>
+          <label class="lbl" for="code">كود الخدمة</label>
+          <input id="code" dir="ltr" style="text-align:left" required aria-label="كود الخدمة">
+        </div>
+        <div class="hint" id="hint">عددك 25 ← تظهر القاعات بسعة 20–40 فقط. القاعة 70 مخفية (للمجموعات 60+).</div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-p" type="submit">🔍 تحديث المتاح لهذه الفترة</button>
+          <a class="btn btn-o" href="halls.html">كل القاعات</a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="النتائج">
+    <h2>القاعات المتاحة لتلك الفترة والساعات المحددة</h2>
+    <p id="resSub">—</p>
+    <div id="res"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-verse">«بلياقة وبحسب ترتيب» <small>(1كو 14:40)</small></div>
+  <div class="footer-main"><div class="wrap footer-grid">
+    <div class="footer-col">
+      <h3>كنيسة العذراء ويوحنا الحبيب</h3>
+      <p>منظومة الحجز الإلكتروني الذكي لقاعات المناسبات والخدمات والأنشطة الكنسية — جناكليس، الإسكندرية.</p>
+      <p class="gold">احجز سمارت مش هارد</p>
+    </div>
+    <div class="footer-col">
+      <h3>التواصل والاستعلام</h3>
+      <ul>
+        <li>📍 جناكليس، الإسكندرية، مصر</li>
+        <li>📞 سكرتارية الكنيسة: <span dir="ltr">03-5840000</span></li>
+        <li>🕘 المواعيد: يوميًا 9 ص — 9 م</li>
+      </ul>
+    </div>
+  </div></div>
+  <div class="footer-bottom"><div class="wrap bottom-in">
+    <span>© جميع الحقوق محفوظة لكنيسة السيدة العذراء ويوحنا الحبيب بجناكليس</span>
+    <span>خدمة التحول الرقمي الكنسي</span>
+  </div></div>
+</footer>
+
+<script src="js/store.js?v=6"></script>
+<script>
+(function () {
+  // Code-only area: no session (service or secretary) -> back to the gate.
+  if (!window.Store || !Store.getSession()) { location.href = 'index.html?why=session'; return; }
+  var db = Store.load();
+  var params = new URLSearchParams(location.search);
+  var presetRoom = params.get('room');
+
+  var ses = Store.getSession();
+  if (ses && ses.role === 'service') document.getElementById('code').value = ses.code;
+  // Same hash handoff as admin: prefill the fresh code, then strip it.
+  (function () {
+    var m = (location.hash || '').match(/^#k=([A-Za-z0-9%._~-]+)$/);
+    if (!m) return;
+    try { document.getElementById('code').value = Store.normCode(decodeURIComponent(m[1])); } catch (e) { /* ignore */ }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e2) { /* ignore */ }
+  })();
+  document.getElementById('date').valueAsDate = new Date();
+
+  var f = document.getElementById('f');
+  var hint = document.getElementById('hint');
+  var res = document.getElementById('res');
+  var resSub = document.getElementById('resSub');
+
+  function endTime(start, hours) {
+    var parts = start.split(':'); var h = +parts[0] + (+hours); var m = parts[1] || '00';
+    return String(h).padStart(2, '0') + ':' + m;
+  }
+
+  function render() {
+    var n = +document.getElementById('count').value || 0;
+    var start = document.getElementById('start').value || '18:00';
+    var hours = +document.getElementById('hours').value || 1;
+    var date = document.getElementById('date').value || '';
+    var end = endTime(start, hours);
+
+    if (n >= 60) hint.textContent = 'عددك ' + n + ' ← القاعة الكبيرة (70) اتفتحت تلقائيًا + إشعار للسكرتارية.';
+    else hint.textContent = 'عددك ' + n + ' ← تظهر القاعات بسعة ' + Math.max(1, n - 10) + '–' + (n + 15) + ' فقط.';
+
+    resSub.textContent = 'الفترة: ' + start + ' — ' + end + ' • ' + hours + ' ساعات • ' + n + ' فرد • ' + date;
+
+    if (!db.rooms.length) {
+      res.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">🏛️</div>' +
+        '<b>لا توجد قاعات بعد</b><p>لم تُضف السكرتارية أي قاعة حتى الآن، لذلك لا توجد نتائج.<br>القاعات الجديدة ستظهر هنا تلقائيًا فور إضافتها.</p>' +
+        '<a class="btn btn-o" href="index.html">تسجيل الدخول بالكود</a></div>';
+      return;
+    }
+
+    var low = Math.max(1, n - 10), high = n + 15;
+    var rows = db.rooms.filter(function (r) {
+      if (presetRoom && r.id !== presetRoom) return false;
+      if (n >= 60) return r.capacity >= 60;
+      return r.capacity >= low && r.capacity <= high && r.capacity >= n - 5;
+    });
+
+    if (!rows.length) {
+      res.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">😕</div>' +
+        '<b>لا توجد قاعة مناسبة لهذا العدد</b><p>جرّب تعديل العدد أو الساعات، أو اطلب تنبيهًا من صفحة القاعات.</p></div>';
+      return;
+    }
+
+    res.innerHTML = '<div class="halls">' + rows.map(function (r) {
+      var busy = r.status === 'booked';
+      return '<article class="hall"><div class="top-row"><div><b>قاعة ' + Store.esc(r.name) + '</b>' +
+        '<small>' + Store.esc(r.floor || '') + ' • السعة القصوى ' + Store.esc(r.capacity) + ' فرد</small></div>' +
+        (busy ? '<span class="st busy">● مشغولة</span>' : '<span class="st free">● متاحة</span>') + '</div>' +
+        '<div class="meta">🕐 الفترة: ' + start + ' حتى ' + end + ' (' + hours + ' ساعات)</div>' +
+        (busy
+          ? '<div class="foot"><button class="btn btn-o btn-block" data-wait="' + Store.esc(r.id) + '">🔔 نبهني لو تم إلغاء الحجز</button></div>'
+          : '<div class="foot"><button class="btn btn-p btn-block" data-book="' + Store.esc(r.id) + '">✓ تأكيد الحجز الفوري</button></div>') +
+        '</article>';
+    }).join('') + '</div>';
+  }
+
+  f.addEventListener('submit', function (e) { e.preventDefault(); render(); });
+  ['count', 'start', 'hours', 'date'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', render);
+  });
+
+  res.addEventListener('click', function (e) {
+    var w = e.target.closest('[data-wait]');
+    if (w) { alert('تم تسجيل طلب التنبيه.'); return; }
+    var b = e.target.closest('[data-book]');
+    if (!b) return;
+    var code = Store.normCode(document.getElementById('code').value);
+    var svc = db.services.find(function (s) { return s.code === code; });
+    if (!svc) { alert('كود الخدمة غير معروف. تواصل مع مسؤول القطاع أو ادخل بكود صالح.'); return; }
+    var room = db.rooms.find(function (r) { return r.id === b.dataset.book; });
+    var booking = {
+      id: Store.uid('BK'), code: Store.bookingCode(),
+      serviceCode: svc.code, serviceName: svc.name,
+      roomId: room.id, roomName: room.name,
+      date: document.getElementById('date').value,
+      dateLabel: document.getElementById('date').value,
+      start: document.getElementById('start').value, hours: +document.getElementById('hours').value,
+      count: +document.getElementById('count').value, status: 'pending', createdAt: new Date().toISOString()
+    };
+    db.bookings.push(booking); Store.save(db);
+    location.href = 'confirm.html?code=' + encodeURIComponent(booking.code);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
