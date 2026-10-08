@@ -138,6 +138,24 @@
     return String(h).padStart(2, '0') + ':' + m;
   }
 
+  // Real slot conflict: same room + same date + overlapping hours
+  // (approved/pending bookings AND secretary hour-blocks) => hall is CLOSED.
+  function bookingEnd(b) { return endTime(b.start, b.hours); }
+  function overlaps(aStart, aEnd, bStart, bEnd) { return aStart < bEnd && bStart < aEnd; }
+  function conflictOf(r, date, start, end) {
+    var cb = db.bookings.filter(function (b) {
+      return b.roomId === r.id && (b.status === 'pending' || b.status === 'approved') &&
+        (b.date || '') === date && overlaps(start, end, b.start || '', bookingEnd(b));
+    });
+    if (cb.length) return { kind: 'booking', by: cb[0].serviceName + ' (' + cb[0].start + '–' + bookingEnd(cb[0]) + ')' };
+    var bl = (db.blocks || []).filter(function (x) {
+      return x.roomId === r.id && x.date === date && overlaps(start, end, x.from, x.to);
+    });
+    if (bl.length) return { kind: 'block', by: 'مغلقة إداريًا (' + bl[0].from + '–' + bl[0].to + ')' };
+    if (r.status === 'booked') return { kind: 'room', by: 'محجوزة اليوم' };
+    return null;
+  }
+
   function render() {
     var n = +document.getElementById('count').value || 0;
     var start = document.getElementById('start').value || '18:00';
@@ -171,13 +189,14 @@
     }
 
     res.innerHTML = '<div class="halls">' + rows.map(function (r) {
-      var busy = r.status === 'booked';
+      var cf = conflictOf(r, date, start, end);
       return '<article class="hall"><div class="top-row"><div><b>قاعة ' + Store.esc(r.name) + '</b>' +
         '<small>' + Store.esc(r.floor || '') + ' • السعة القصوى ' + Store.esc(r.capacity) + ' فرد</small></div>' +
-        (busy ? '<span class="st busy">● مشغولة</span>' : '<span class="st free">● متاحة</span>') + '</div>' +
-        '<div class="meta">🕐 الفترة: ' + start + ' حتى ' + end + ' (' + hours + ' ساعات)</div>' +
-        (busy
-          ? '<div class="foot"><button class="btn btn-o btn-block" data-wait="' + Store.esc(r.id) + '">🔔 نبهني لو تم إلغاء الحجز</button></div>'
+        (cf ? '<span class="st busy">● مقفولة</span>' : '<span class="st free">● متاحة</span>') + '</div>' +
+        '<div class="meta">🕐 الفترة: ' + start + ' حتى ' + end + ' (' + hours + ' ساعات)' +
+        (cf ? '<br>🔒 ' + Store.esc(cf.by) + ' — مش فاضية في المعاد ده' : '') + '</div>' +
+        (cf
+          ? '<div class="foot"><button class="btn btn-o btn-block" data-wait="' + Store.esc(r.id) + '">🔔 نبهني لو فضيت</button></div>'
           : '<div class="foot"><button class="btn btn-p btn-block" data-book="' + Store.esc(r.id) + '">✓ تأكيد الحجز الفوري</button></div>') +
         '</article>';
     }).join('') + '</div>';
@@ -197,6 +216,10 @@
     var svc = db.services.find(function (s) { return s.code === code; });
     if (!svc) { alert('كود الخدمة غير معروف. تواصل مع مسؤول القطاع أو ادخل بكود صالح.'); return; }
     var room = db.rooms.find(function (r) { return r.id === b.dataset.book; });
+    if (!room) { render(); return; }
+    // Re-check right before saving: someone may have taken the slot meanwhile.
+    var cf = conflictOf(room, document.getElementById('date').value, document.getElementById('start').value, endTime(document.getElementById('start').value, +document.getElementById('hours').value || 1));
+    if (cf) { alert('القاعة اتحجزت في المعاد ده (' + cf.by + '). اختار معاد تاني.'); render(); return; }
     var booking = {
       id: Store.uid('BK'), code: Store.bookingCode(),
       serviceCode: svc.code, serviceName: svc.name,
