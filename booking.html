@@ -126,7 +126,12 @@
     try { document.getElementById('code').value = Store.normCode(decodeURIComponent(m[1])); } catch (e) { /* ignore */ }
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e2) { /* ignore */ }
   })();
-  document.getElementById('date').valueAsDate = new Date();
+  // Default + minimum = LOCAL today (valueAsDate uses UTC and can lag a day).
+  try { var t0 = todayISO(); var di0 = document.getElementById('date'); di0.value = t0; di0.min = t0; } catch (e) { /* ignore */ }
+  function todayISO() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
 
   var f = document.getElementById('f');
   var hint = document.getElementById('hint');
@@ -167,6 +172,13 @@
     else hint.textContent = 'عددك ' + n + ' ← تظهر القاعات بسعة ' + Math.max(1, n - 10) + '–' + (n + 15) + ' فقط.';
 
     resSub.textContent = 'الفترة: ' + Store.t12(start) + ' — ' + Store.t12(end) + ' • ' + hours + ' ساعات • ' + n + ' فرد • ' + date;
+
+    // Booking is future-only: from today onward.
+    if (!date || date < todayISO()) {
+      res.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">📅</div>' +
+        '<b>التاريخ لازم يكون من النهاردة للمستقبل</b><p>اختار تاريخ اليوم أو أي يوم جاي عشان تحجز.</p></div>';
+      return;
+    }
 
     if (!db.rooms.length) {
       res.innerHTML = '<div class="empty" role="status"><div class="big" aria-hidden="true">🏛️</div>' +
@@ -217,6 +229,8 @@
     if (!svc) { alert('كود الخدمة غير معروف. تواصل مع مسؤول القطاع أو ادخل بكود صالح.'); return; }
     var room = db.rooms.find(function (r) { return r.id === b.dataset.book; });
     if (!room) { render(); return; }
+    var bkDate = document.getElementById('date').value;
+    if (!bkDate || bkDate < todayISO()) { alert('التاريخ لازم يكون من النهاردة للمستقبل.'); render(); return; }
     // Re-check right before saving: someone may have taken the slot meanwhile.
     var cf = conflictOf(room, document.getElementById('date').value, document.getElementById('start').value, endTime(document.getElementById('start').value, +document.getElementById('hours').value || 1));
     if (cf) { alert('القاعة اتحجزت في المعاد ده (' + cf.by + '). اختار معاد تاني.'); render(); return; }
