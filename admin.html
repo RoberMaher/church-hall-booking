@@ -362,6 +362,19 @@
       refresh();
     }
   });
+  function shiftWeek(n) {
+    var d = new Date(weekAnchor);
+    d.setDate(d.getDate() + n);
+    weekAnchor = d;
+    renderWeek();
+  }
+  document.getElementById('prevW').addEventListener('click', function () { shiftWeek(-7); });
+  document.getElementById('nextW').addEventListener('click', function () { shiftWeek(7); });
+  document.getElementById('thisW').addEventListener('click', function () {
+    weekAnchor = new Date();
+    weekAnchor.setHours(0, 0, 0, 0);
+    renderWeek();
+  });
   document.getElementById('weekDate').addEventListener('change', function (e) {
     var v = e.target.value;
     if (!v) return;
